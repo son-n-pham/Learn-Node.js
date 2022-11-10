@@ -68,6 +68,8 @@ const fs = require('fs');
 const http = require('http');
 const url = require('url');
 
+// import self-created module
+const replaceTemplate = require('./modules/replaceTemplate')
 
 // ///////////////
 // // This is inefficient version as readfile has to be run each time the user send the request
@@ -102,22 +104,6 @@ const url = require('url');
 
 // ///////////////
 // This is the efficient version as readfile is run once from beginning to load the file. As it is run only once, we can use readFileSync as the blocking is not a long time.
-
-const replaceTemplate = (temp, product) => {
-	let output = temp.replace(/{%PRODUCTNAME%}/g, product.productName);
-	output = output.replace(/{%IMAGE%}/g, product.image);
-	output = output.replace(/{%FROM%}/g, product.from);
-	output = output.replace(/{%NUTRIENTS%}/g, product.nutrients);
-	output = output.replace(/{%QUANTITY%}/g, product.quantity);
-	output = output.replace(/{%PRICE%}/g, product.price);
-	output = output.replace(/{%ID%}/g, product.id);
-	output = output.replace(/{%DESCRIPTION%}/g, product.description);
-
-	if(!product.organic) output = output.replace(/{%NOTORGANIC%}/g, 'not-organic');
-
-	return output;
-}
-
 const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8')
 const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8')
 const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8')

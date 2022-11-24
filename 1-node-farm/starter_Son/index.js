@@ -33,12 +33,10 @@
 // // //////////////////////////////////////////////
 // // Build a server
 // const http = require('http');
-// const url = require('url');
+// // const url = require('url');
 
 // const server = http.createServer((request, response) => {
 // 	// console.log(request); //This is to see all contents of the request
-// 	console.log(request.url);
-
 // 	const pathName = request.url;
 
 // 	if(pathName==='/' || pathName==='/overview') {
@@ -62,14 +60,14 @@
 // })
 
 
-// /////////////////////////////////////////////////////
-// Build a Simple API
-const fs = require('fs');
-const http = require('http');
-const url = require('url');
+// // /////////////////////////////////////////////////////
+// // Build a Simple API
+// const fs = require('fs');
+// const http = require('http');
+// const url = require('url');
 
-// import self-created module
-const replaceTemplate = require('./modules/replaceTemplate')
+// // import self-created module
+// const replaceTemplate = require('./modules/replaceTemplate')
 
 // ///////////////
 // // This is inefficient version as readfile has to be run each time the user send the request
@@ -102,57 +100,87 @@ const replaceTemplate = require('./modules/replaceTemplate')
 // });
 
 
-// ///////////////
-// This is the efficient version as readfile is run once from beginning to load the file. As it is run only once, we can use readFileSync as the blocking is not a long time.
-const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8')
-const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8')
-const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8')
+// // ///////////////
+// // This is the efficient version as readfile is run once from beginning to load the file. As it is run only once, we can use readFileSync as the blocking is not a long time.
+// const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8')
+// const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8')
+// const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8')
 
-const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8')
-const dataObj = JSON.parse(data);
+// const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8')
+// const dataObj = JSON.parse(data);
+
+// const server = http.createServer((request, response) => {
+
+// 	// console.log("Hello");
+// 	// console.log(request.url);
+// 	const {query, pathname} = url.parse(request.url, true);
+// 	console.log(query);
+// 	console.log(pathname);
+// 	const pathName = pathname;
+
+// 	// Overview page
+// 	if(pathName==='/' || pathName==='/overview') {
+// 		response.writeHead(200, {'content-type': 'text/html'});
+
+// 		const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('');
+// 		const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml)
+
+// 		response.end(output);
+
+// 	// Product page
+// 	} else if(pathName==='/product') {
+// 		const product = dataObj[query.id];
+// 		const output = replaceTemplate(tempProduct, product);
+
+// 		response.end(output);
+
+// 	// API
+// 	} else if(pathName==='/api') {
+// 			response.writeHead(200, {'content-type': 'application/json'});
+// 			response.end(data);
+
+// 	// Not found
+// 	}	else {
+// 		response.writeHead(404, {
+// 			'Content-type': 'text/html',
+// 			'my-own-header': 'hello-world'
+// 		});
+// 		response.end('<h1>Page not found!</h1>')
+// 	}
+// });
+
+
+// // This ip address is the standard for localhost
+// server.listen(8000, '127.0.0.1', () => {
+// 	console.log('Listening to requests on port 8000');
+// })
+
+// /////////////////// Node Farm API ///////////////////
+const http = require('http');
+const fs = require('fs');
+const url = require('url');
 
 const server = http.createServer((request, response) => {
 
-	// console.log("Hello");
-	// console.log(request.url);
-	const {query, pathname} = url.parse(request.url, true);
-	console.log(query);
-	console.log(pathname);
-	const pathName = pathname;
+	const {query, pathName } = url.parse(request.url);
+	console.log(pathName);
+	console.log(typeof query);
 
-	// Overview page
-	if(pathName==='/' || pathName==='/overview') {
-		response.writeHead(200, {'content-type': 'text/html'});
-
-		const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('');
-		const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml)
-
-		response.end(output);
-
-	// Product page
-	} else if(pathName==='/product') {
-		const product = dataObj[query.id];
-		const output = replaceTemplate(tempProduct, product);
-
-		response.end(output);
-
-	// API
-	} else if(pathName==='/api') {
-			response.writeHead(200, {'content-type': 'application/json'});
-			response.end(data);
-
-	// Not found
-	}	else {
-		response.writeHead(404, {
-			'Content-type': 'text/html',
+	if (pathName === '/' || pathName==='/overview') {
+		response.end('This is overview');
+	} else if (pathName === '/product') {
+		response.end('This is Product');
+	} else if (pathName === '/api') {
+		response.end('This is API');
+	} else {
+		response.writeHead(statusCode = 404, headers = {
+			'content-type': 'text/html',
 			'my-own-header': 'hello-world'
-		});
-		response.end('<h1>Page not found!</h1>')
+		})
+		response.end('<h1>Page not found</h1>');
 	}
-});
+})
 
-
-// This ip address is the standard for localhost
 server.listen(8000, '127.0.0.1', () => {
-	console.log('Listening to requests on port 8000');
+	console.log('Listening to port 8000');
 })
